@@ -8,11 +8,11 @@ import { Sun, Moon, Menu, X, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { label: "[01.WORK]", href: "/work" },
-  { label: "[02.ABOUT]", href: "/about" },
-  { label: "[03.LORE]", href: "/blog" },
-  { label: "[04.COMM]", href: "/contact" },
-  { label: "[05.STATS]", href: "/resume" },
+  { label: "01.WORK", href: "/work" },
+  { label: "02.ABOUT", href: "/about" },
+  { label: "03.LORE", href: "/blog" },
+  { label: "04.COMM", href: "/contact" },
+  { label: "05.STATS", href: "/resume" },
 ];
 
 export function Navbar() {
