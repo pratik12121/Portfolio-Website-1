@@ -54,8 +54,8 @@ export default function ResumePage() {
 
             <div className="text-[10px] font-pixel text-muted-foreground space-y-1 sm:text-right">
               <div>BASE: KATHMANDU, NEPAL (NPT / UTC+5:45)</div>
-              <div>COMM: pratik@domain.nepal</div>
-              <div>WEB: https://pratik.nepal</div>
+              <div>COMM: silwalpratik@gmail.com</div>
+              <div>WEB: https://https://portfolio-website-1-snowy.vercel.app/work</div>
             </div>
           </div>
 

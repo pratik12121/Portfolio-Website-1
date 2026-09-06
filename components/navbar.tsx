@@ -4,8 +4,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Menu, X, ArrowUpRight } from "lucide-react";
+import { Sun, Moon, Menu, X, ArrowUpRight, Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Loaded only in browser — Three.js needs window/canvas
+const SnakeGame = dynamic(() => import("./SnakeGame"), { ssr: false });
 
 const NAV_LINKS = [
   { label: "01.WORK", href: "/work" },
@@ -21,6 +26,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSnakeOpen, setIsSnakeOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -113,6 +119,21 @@ export function Navbar() {
             )}
           </button>
 
+          {/* Snake Easter Egg trigger */}
+          <button
+            onClick={() => setIsSnakeOpen((o) => !o)}
+            aria-label="Toggle snake game"
+            title="🐍 Easter egg"
+            className={cn(
+              "w-7 h-7 flex items-center justify-center border transition-colors",
+              isSnakeOpen
+                ? "text-[#39FF14] bg-[#39FF14]/10 border-[#39FF14]/60 shadow-[0_0_8px_rgba(57,255,20,0.4)]"
+                : "text-muted-foreground hover:text-[#39FF14] bg-black/50 border-white/[0.15] hover:border-[#39FF14]/60"
+            )}
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+          </button>
+
           {/* Quick Contact Action */}
           <Link
             href="/contact"
@@ -177,6 +198,50 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {/* ── Snake Game Panel ─────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isSnakeOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="snake-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 pointer-events-auto"
+              onClick={() => setIsSnakeOpen(false)}
+            />
+
+            {/* Panel */}
+            <motion.div
+              key="snake-panel"
+              initial={{ opacity: 0, y: -16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.97 }}
+              transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[min(96vw,460px)] p-4 bg-[#070612]/98 border-2 border-[#39FF14]/50 shadow-[0_0_40px_rgba(57,255,20,0.25)] pointer-events-auto"
+            >
+              {/* Panel header */}
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2">
+                  <Gamepad2 className="w-3.5 h-3.5 text-[#39FF14]" />
+                  <span className="font-pixel text-[10px] text-[#39FF14] tracking-widest">
+                    MINI-QUEST: SNAKE.EXE
+                  </span>
+                </div>
+                <span className="font-pixel text-[9px] text-muted-foreground">
+                  [EASTER EGG UNLOCKED]
+                </span>
+              </div>
+
+              {/* Game */}
+              <SnakeGame onClose={() => setIsSnakeOpen(false)} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
