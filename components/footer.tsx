@@ -24,16 +24,16 @@ export function Footer() {
   const domains = Object.keys(DOMAIN_CONFIG) as Domain[];
 
   return (
-    <footer className="relative border-t-2 border-[#00F0FF]/30 bg-[#040409] text-foreground pt-14 pb-12 overflow-hidden font-mono">
+    <footer className="relative border-t-2 dark:border-[#00F0FF]/30 border-[#008B99]/30 dark:bg-[#040409] bg-[#ECE9DF] text-foreground pt-14 pb-12 overflow-hidden font-mono">
       {/* Subtle CRT Phosphor Scan Grid */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-36 bg-gradient-to-b from-[#00F0FF]/10 via-transparent to-transparent blur-2xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Top Tier: Arcade Credits Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10 border-b border-white/[0.1]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10 border-b dark:border-white/[0.1] border-zinc-300">
           <div className="lg:col-span-6 space-y-4">
             <div className="flex items-center gap-2">
-              <span className="font-pixel font-bold text-xl sm:text-2xl text-white text-glow-cyan tracking-wider">
+              <span className="font-pixel font-bold text-xl sm:text-2xl dark:text-white text-zinc-900 text-glow-cyan tracking-wider">
                 PRATIK SILWAL 
               </span>
               <span className="text-[10px] font-pixel px-2 py-0.5 bg-[#00F0FF]/15 text-[#00F0FF] border border-[#00F0FF]/40">

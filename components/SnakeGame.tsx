@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
@@ -47,6 +47,7 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const overlayScoreRef = useRef<HTMLSpanElement>(null);
   const restartRef = useRef<() => void>(() => {});
+  const triggerDirRef = useRef<(d: Dir) => void>(() => {});
 
   // Close on Esc
   useEffect(() => {
@@ -59,6 +60,10 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
 
   const handleRestart = useCallback(() => {
     restartRef.current();
+  }, []);
+
+  const handleDirInput = useCallback((dir: Dir) => {
+    triggerDirRef.current(dir);
   }, []);
 
   // Three.js scene
@@ -83,9 +88,12 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
     camera.position.z = 10;
 
     const renderer = new THREE.WebGLRenderer({ antialias: false });
-    renderer.setPixelRatio(1);
-    const size = Math.min(container.clientWidth, container.clientHeight);
-    renderer.setSize(size, size);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const initialSize = container.clientWidth || container.offsetWidth || 300;
+    renderer.setSize(initialSize, initialSize, false);
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.display = "block";
     container.appendChild(renderer.domElement);
 
     // Grid overlay
@@ -209,6 +217,14 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
       }
     }
 
+    function queueDir(nextDir: Dir) {
+      if (dirQueue.length < 2) {
+        dirQueue.push(nextDir);
+      }
+    }
+
+    triggerDirRef.current = queueDir;
+
     restartRef.current = () => {
       clearInterval(tickInterval);
       initGame();
@@ -248,7 +264,10 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
     };
     const onKeyDown = (e: KeyboardEvent) => {
       const mapped = DIR_MAP[e.key];
-      if (mapped) { e.preventDefault(); if (dirQueue.length < 2) dirQueue.push(mapped); }
+      if (mapped) {
+        e.preventDefault();
+        queueDir(mapped);
+      }
       if (e.key === " " && gameOver) restartRef.current();
     };
     window.addEventListener("keydown", onKeyDown);
@@ -260,22 +279,28 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
+    const onTouchMove = (e: TouchEvent) => {
+      // Prevent browser bounce / pull to refresh while playing on canvas
+      if (e.cancelable) e.preventDefault();
+    };
     const onTouchEnd = (e: TouchEvent) => {
       const dx = e.changedTouches[0].clientX - touchStartX;
       const dy = e.changedTouches[0].clientY - touchStartY;
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dx) < 16 && Math.abs(dy) < 16) return;
       const swipeDir: Dir = Math.abs(dx) > Math.abs(dy)
         ? (dx > 0 ? "R" : "L")
         : (dy > 0 ? "D" : "U");
-      if (dirQueue.length < 2) dirQueue.push(swipeDir);
+      queueDir(swipeDir);
     };
     container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
     container.addEventListener("touchend", onTouchEnd, { passive: true });
 
     // Resize
     const onResize = () => {
-      const s = Math.min(container.clientWidth, container.clientHeight);
-      renderer.setSize(s, s);
+      if (!container) return;
+      const s = container.clientWidth || container.offsetWidth || 300;
+      renderer.setSize(s, s, false);
     };
     const resizeObserver = new ResizeObserver(onResize);
     resizeObserver.observe(container);
@@ -289,6 +314,7 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
       clearInterval(tickInterval);
       window.removeEventListener("keydown", onKeyDown);
       container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
       container.removeEventListener("touchend", onTouchEnd);
       resizeObserver.disconnect();
       cellGeo.dispose();
@@ -304,7 +330,7 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 w-full items-center">
+    <div className="flex flex-col gap-2.5 w-full items-center select-none">
       {/* HUD */}
       <div className="w-full flex items-center justify-between px-1">
         <div className="flex gap-4 font-pixel text-[11px]">
@@ -325,38 +351,89 @@ export default function SnakeGame({ onClose }: SnakeGameProps) {
       </div>
 
       {/* Canvas wrapper */}
-      <div className="relative w-full" style={{ maxWidth: 420, aspectRatio: "1/1" }}>
-        <div
-          ref={containerRef}
-          className="w-full h-full border border-[#00F0FF]/30"
-          style={{ touchAction: "none" }}
-        />
+      <div className="relative w-full max-w-[320px] sm:max-w-[360px] mx-auto">
+        {/* Square spacer: padding-bottom = 100% */}
+        <div style={{ paddingBottom: "100%", position: "relative" }}>
+          <div
+            ref={containerRef}
+            className="border border-[#00F0FF]/40 shadow-[0_0_15px_rgba(0,240,255,0.15)]"
+            style={{
+              position: "absolute",
+              inset: 0,
+              touchAction: "none",
+              overflow: "hidden",
+            }}
+          />
 
-        {/* Game Over overlay */}
-        <div
-          ref={overlayRef}
-          style={{ display: "none" }}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#05050A]/90 border border-[#FF007F]/60 backdrop-blur-sm"
-        >
-          <p className="font-pixel text-[#FF007F] text-base tracking-widest">GAME OVER</p>
-          <p className="font-pixel text-white text-xs">
-            SCORE: <span ref={overlayScoreRef} className="text-[#FFE600]">0</span>
-          </p>
-          <button
-            onClick={handleRestart}
-            className="flex items-center gap-1.5 px-3 py-1.5 font-pixel text-[10px] text-black bg-[#39FF14] hover:bg-[#39FF14]/90 border border-[#39FF14] shadow-[0_0_12px_rgba(57,255,20,0.5)] transition-all"
+          {/* Game Over overlay */}
+          <div
+            ref={overlayRef}
+            style={{ display: "none", position: "absolute", inset: 0 }}
+            className="flex flex-col items-center justify-center gap-2.5 bg-[#05050A]/92 border border-[#FF007F]/60 backdrop-blur-sm z-10"
           >
-            <RotateCcw className="w-3 h-3" />
-            RETRY
+            <p className="font-pixel text-[#FF007F] text-base tracking-widest animate-pulse">
+              GAME OVER
+            </p>
+            <p className="font-pixel text-white text-xs">
+              SCORE: <span ref={overlayScoreRef} className="text-[#FFE600]">0</span>
+            </p>
+            <button
+              onClick={handleRestart}
+              className="flex items-center gap-1.5 px-4 py-2 font-pixel text-[10px] text-black bg-[#39FF14] hover:bg-[#39FF14]/90 active:scale-95 border border-[#39FF14] shadow-[0_0_12px_rgba(57,255,20,0.5)] transition-all"
+            >
+              <RotateCcw className="w-3 h-3" />
+              RETRY
+            </button>
+            <p className="font-pixel text-[9px] text-muted-foreground">
+              or press [SPACE]
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Touch D-Pad */}
+      <div className="flex flex-col items-center gap-1 mt-1 sm:hidden">
+        <button
+          type="button"
+          onClick={() => handleDirInput("U")}
+          aria-label="Move Up"
+          className="w-12 h-10 flex items-center justify-center bg-white/[0.06] active:bg-[#00F0FF]/30 border border-white/20 active:border-[#00F0FF] text-white font-pixel text-xs rounded transition-all active:scale-95 shadow-sm"
+        >
+          ▲
+        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => handleDirInput("L")}
+            aria-label="Move Left"
+            className="w-12 h-10 flex items-center justify-center bg-white/[0.06] active:bg-[#00F0FF]/30 border border-white/20 active:border-[#00F0FF] text-white font-pixel text-xs rounded transition-all active:scale-95 shadow-sm"
+          >
+            ◀
           </button>
-          <p className="font-pixel text-[9px] text-muted-foreground">or press [SPACE]</p>
+          <button
+            type="button"
+            onClick={() => handleDirInput("D")}
+            aria-label="Move Down"
+            className="w-12 h-10 flex items-center justify-center bg-white/[0.06] active:bg-[#00F0FF]/30 border border-white/20 active:border-[#00F0FF] text-white font-pixel text-xs rounded transition-all active:scale-95 shadow-sm"
+          >
+            ▼
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDirInput("R")}
+            aria-label="Move Right"
+            className="w-12 h-10 flex items-center justify-center bg-white/[0.06] active:bg-[#00F0FF]/30 border border-white/20 active:border-[#00F0FF] text-white font-pixel text-xs rounded transition-all active:scale-95 shadow-sm"
+          >
+            ▶
+          </button>
         </div>
       </div>
 
       {/* Controls hint */}
-      <p className="font-pixel text-[9px] text-muted-foreground tracking-wider text-center">
-        WASD / &uarr;&darr;&larr;&rarr; TO MOVE &middot; ESC TO EXIT
+      <p className="font-pixel text-[8px] sm:text-[9px] text-muted-foreground tracking-wider text-center hidden sm:block">
+        WASD / ↑↓←→ TO MOVE · ESC TO EXIT
       </p>
     </div>
   );
 }
+

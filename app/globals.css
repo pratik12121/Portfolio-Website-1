@@ -4,18 +4,20 @@
 
 @layer base {
   :root {
-    --background: 240 20% 4%;
-    --foreground: 220 50% 94%;
-    --card: 240 25% 6%;
-    --card-foreground: 220 50% 94%;
-    --border: 240 20% 18%;
-    --muted: 240 20% 12%;
-    --muted-foreground: 220 20% 65%;
-    --accent: 184 100% 50%;
-    --accent-foreground: 240 20% 4%;
+    /* Light Mode: Retro Game Boy Pocket / Famicom Cartridge / Arcade Dossier */
+    --background: 45 15% 95%;
+    --foreground: 240 18% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 18% 10%;
+    --border: 45 12% 80%;
+    --muted: 45 12% 90%;
+    --muted-foreground: 240 12% 38%;
+    --accent: 184 90% 32%;
+    --accent-foreground: 0 0% 100%;
   }
 
   .dark {
+    /* Dark Mode: Retro CRT Terminal / Cyber Arcade */
     --background: 240 20% 3%;
     --foreground: 220 50% 96%;
     --card: 240 25% 5%;
@@ -143,3 +145,152 @@
     max-width: 100% !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   RETRO ARCADE LIGHT THEME OVERRIDES (Game Boy Pocket / Famicom)
+   Triggers whenever the user toggles dark mode off
+────────────────────────────────────────────────────────────── */
+html:not(.dark) body {
+  background-color: #F5F4EE !important;
+  color: #12121E !important;
+}
+
+/* Light mode scanlines & vignette */
+html:not(.dark) .crt-scanlines {
+  background: linear-gradient(
+    rgba(0, 0, 0, 0) 50%, 
+    rgba(0, 0, 0, 0.04) 50%
+  ) !important;
+  background-size: 100% 4px !important;
+  opacity: 0.25 !important;
+}
+
+html:not(.dark) .crt-vignette {
+  background: radial-gradient(circle at center, transparent 75%, rgba(0, 0, 0, 0.06) 100%) !important;
+  opacity: 0.3 !important;
+}
+
+/* Light mode scrollbar */
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #E8E6DC !important;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #008B99 !important;
+  box-shadow: 0 0 6px rgba(0, 139, 153, 0.4) !important;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #2E7D32 !important;
+}
+
+/* Light mode card and container surfaces */
+html:not(.dark) .bg-\[\#070712\],
+html:not(.dark) .bg-\[\#070714\],
+html:not(.dark) .bg-\[\#070612\],
+html:not(.dark) .bg-\[\#05050C\],
+html:not(.dark) .bg-\[\#05050A\],
+html:not(.dark) .bg-\[\#030307\],
+html:not(.dark) .bg-\[\#040409\],
+html:not(.dark) .bg-\[\#090815\],
+html:not(.dark) .bg-\[\#0A0714\],
+html:not(.dark) .bg-\[\#0A0A1C\],
+html:not(.dark) .bg-\[\#040407\] {
+  background-color: #FFFFFF !important;
+}
+
+/* Light mode section alternating backgrounds */
+html:not(.dark) section.bg-\[\#030307\],
+html:not(.dark) section.bg-\[\#040409\] {
+  background-color: #EDEAE1 !important;
+  border-color: rgba(0, 139, 153, 0.25) !important;
+}
+
+/* Light mode footer */
+html:not(.dark) footer {
+  background-color: #ECE9DF !important;
+  border-top-color: rgba(0, 139, 153, 0.35) !important;
+}
+
+/* Light mode borders */
+html:not(.dark) .border-white\/\[0\.08\],
+html:not(.dark) .border-white\/\[0\.1\],
+html:not(.dark) .border-white\/\[0\.12\],
+html:not(.dark) .border-white\/\[0\.15\],
+html:not(.dark) .border-white\/\[0\.2\],
+html:not(.dark) .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Light mode typography & high contrast readability */
+html:not(.dark) .text-white {
+  color: #12121E !important;
+}
+html:not(.dark) .text-muted-foreground {
+  color: #4A4858 !important;
+}
+html:not(.dark) .text-\[\#E0E7FE\] {
+  color: #161524 !important;
+}
+
+/* Form inputs in contact page */
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+  background-color: #FFFFFF !important;
+  color: #12121E !important;
+  border-color: #D3D0C4 !important;
+}
+html:not(.dark) input:focus,
+html:not(.dark) textarea:focus {
+  border-color: #008B99 !important;
+  outline: none;
+}
+
+/* High contrast retro glow in light mode */
+html:not(.dark) .text-glow-cyan {
+  text-shadow: 0 0 2px rgba(0, 139, 153, 0.4) !important;
+  color: #007A87 !important;
+}
+html:not(.dark) .text-glow-green {
+  text-shadow: 0 0 2px rgba(46, 125, 50, 0.4) !important;
+  color: #1B5E20 !important;
+}
+html:not(.dark) .text-glow-magenta {
+  text-shadow: 0 0 2px rgba(194, 24, 91, 0.4) !important;
+  color: #C2185B !important;
+}
+html:not(.dark) .text-glow-amber {
+  text-shadow: 0 0 2px rgba(216, 67, 21, 0.4) !important;
+  color: #D84315 !important;
+}
+html:not(.dark) .text-glow-gold {
+  text-shadow: 0 0 2px rgba(245, 127, 23, 0.4) !important;
+  color: #B26A00 !important;
+}
+html:not(.dark) .text-glow-red {
+  text-shadow: 0 0 2px rgba(198, 40, 40, 0.4) !important;
+  color: #C62828 !important;
+}
+
+/* Light mode tags & badges */
+html:not(.dark) .text-\[\#00F0FF\] {
+  color: #007A87 !important;
+}
+html:not(.dark) .text-\[\#39FF14\] {
+  color: #1A7A12 !important;
+}
+html:not(.dark) .text-\[\#FFE600\] {
+  color: #9C6800 !important;
+}
+html:not(.dark) .text-\[\#FF007F\] {
+  color: #C2185B !important;
+}
+html:not(.dark) .border-\[\#00F0FF\],
+html:not(.dark) .border-\[\#00F0FF\]\/40,
+html:not(.dark) .border-\[\#00F0FF\]\/50,
+html:not(.dark) .border-\[\#00F0FF\]\/35 {
+  border-color: rgba(0, 139, 153, 0.45) !important;
+}
+html:not(.dark) .bg-\[\#00F0FF\]\/15 {
+  background-color: rgba(0, 139, 153, 0.12) !important;
+}
+

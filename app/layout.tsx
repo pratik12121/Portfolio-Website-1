@@ -100,9 +100,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${silkscreen.variable} ${vt323.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable} dark`}
+      className={`${silkscreen.variable} ${vt323.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable}`}
     >
-      <body className="min-h-screen font-mono bg-[#05050A] text-[#E0E7FE] relative overflow-x-hidden selection:bg-[#00F0FF]/30 selection:text-[#00F0FF]">
+      <body className="min-h-screen font-mono bg-background text-foreground transition-colors duration-300 relative overflow-x-hidden selection:bg-[#00F0FF]/30 selection:text-[#00F0FF]">
         {/* CRT Scanline Overlay Effect */}
         <div className="fixed inset-0 crt-scanlines pointer-events-none z-50 opacity-45" />
 

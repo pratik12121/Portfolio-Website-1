@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { useTheme } from "next-themes";
 import { DOMAIN_CONFIG, Domain } from "@/lib/utils";
 
 interface HeroCanvasProps {
@@ -12,15 +13,18 @@ interface HeroCanvasProps {
 export function HeroCanvas({ activeDomain, className = "" }: HeroCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [webGLAvailable, setWebGLAvailable] = useState<boolean>(true);
+  const { resolvedTheme } = useTheme();
   const targetColorRef = useRef<THREE.Color>(new THREE.Color("#00F0FF"));
 
   useEffect(() => {
     if (activeDomain && DOMAIN_CONFIG[activeDomain]) {
       targetColorRef.current = new THREE.Color(DOMAIN_CONFIG[activeDomain].color);
     } else {
-      targetColorRef.current = new THREE.Color("#00F0FF");
+      targetColorRef.current = new THREE.Color(
+        resolvedTheme === "light" ? "#008B99" : "#00F0FF"
+      );
     }
-  }, [activeDomain]);
+  }, [activeDomain, resolvedTheme]);
 
   useEffect(() => {
     const container = containerRef.current;
